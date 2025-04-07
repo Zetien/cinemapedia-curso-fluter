@@ -38,6 +38,9 @@ class _HomeViewState extends ConsumerState<_HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    final initialLoading = ref.watch(initialLoadingProvider);
+    if (initialLoading) return const FullScreenLoader();
+
     final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
     final slidesShowMovies = ref.watch(moviesSlideshowProvider);
     final popularMovies = ref.watch(popularMoviesProvider);
@@ -68,9 +71,8 @@ class _HomeViewState extends ConsumerState<_HomeView> {
                   movies: upComingMovies,
                   title: 'Proximamente',
                   subTitle: 'En este mes',
-                  loadNextPage: () => ref
-                      .read(upComingMoviesProvider.notifier)
-                      .loadNextPage()),
+                  loadNextPage: () =>
+                      ref.read(upComingMoviesProvider.notifier).loadNextPage()),
               MovieHorizontalListview(
                   movies: popularMovies,
                   title: 'Populares',
