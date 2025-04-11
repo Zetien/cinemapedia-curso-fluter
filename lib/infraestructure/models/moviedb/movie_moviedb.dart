@@ -34,21 +34,24 @@ class MovieMovieDB {
   factory MovieMovieDB.fromJson(Map<String, dynamic> json) => MovieMovieDB(
         adult: json["adult"] ?? false,
         backdropPath: json["backdrop_path"] ?? '',
-        genreIds: List<int>.from(json["genre_ids"].map((x) => x)),
+        genreIds: (json["genre_ids"] != null)
+            ? List<int>.from(json["genre_ids"])
+            : [],
         id: json["id"],
-        originalLanguage: json["original_language"],
-        originalTitle: json["original_title"],
+        originalLanguage: json["original_language"] ?? '',
+        originalTitle: json["original_title"] ?? '',
         overview: json["overview"] ?? '',
-        popularity: json["popularity"]?.toDouble(),
+        popularity: (json["popularity"] != null)
+            ? json["popularity"].toDouble()
+            : 0.0,
         posterPath: json["poster_path"] ?? '',
-        releaseDate: (json["release_date"] != null &&
-                json["release_date"].toString().isNotEmpty)
-            ? DateTime.tryParse(json["release_date"])
-            : null,
-        title: json["title"],
-        video: json["video"],
-        voteAverage: json["vote_average"]?.toDouble(),
-        voteCount: json["vote_count"],
+        releaseDate: _parseDate(json["release_date"]),
+        title: json["title"] ?? '',
+        video: json["video"] ?? false,
+        voteAverage: (json["vote_average"] != null)
+            ? json["vote_average"].toDouble()
+            : 0.0,
+        voteCount: (json["vote_count"] is int) ? json["vote_count"] : 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -69,4 +72,10 @@ class MovieMovieDB {
         "vote_average": voteAverage,
         "vote_count": voteCount,
       };
+
+  /// Método auxiliar para parsear fechas de forma segura
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null || value.toString().isEmpty) return null;
+    return DateTime.tryParse(value);
+  }
 }
