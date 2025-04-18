@@ -1,0 +1,2 @@
+C:/Users/jzett/Documents/Flutter Projects/cinemapedia-curso-fluter/android/app/.cxx/Debug/6k18um1k/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/jzett/Documents/Flutter Projects/cinemapedia-curso-fluter/android/app/.cxx/Debug/6k18um1k/arm64-v8a/CMakeFiles/rebuild_cache.dir
