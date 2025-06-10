@@ -1,7 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
-import 'package:cinemapedia/presentation/providers/actors/actors_by_movie_provider.dart';
-import 'package:cinemapedia/presentation/providers/movies/movie_info_provider.dart';
+import 'package:cinemapedia/domain/repositories/local_storage_repository.dart';
+import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -165,12 +165,20 @@ class _ActorsByMovie extends ConsumerWidget {
   }
 }
 
-class _CustomSliverAppbar extends StatelessWidget {
+final isFavoriteProvider = FutureProvider.family.autoDispose((ref, int movieId) {
+  final localStorageRepository = ref.watch(localStorageRepositoryProvider);
+  return localStorageRepository.isMovieFavorite(movieId);
+});
+
+class _CustomSliverAppbar extends ConsumerWidget {
   final Movie movie;
   const _CustomSliverAppbar({required this.movie});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    final isFavoriteFuture = ref.watch(isFavoriteProvider(movie.id));
+
     final size = MediaQuery.of(context).size;
     return SliverAppBar(
       backgroundColor: Colors.black,
@@ -179,11 +187,19 @@ class _CustomSliverAppbar extends StatelessWidget {
       actions: [
         IconButton(
             onPressed: () {
-              //TODO: Realizar la funcionalidad de favoritos
+              ref.watch(localStorageRepositoryProvider).toggleFavorite(movie);
+              ref.invalidate(isFavoriteProvider(movie.id));
             },
-            icon: const Icon(Icons.favorite_border)
-            //icon: const Icon(Icons.favorite_rounded, color: Colors.red,)
+            icon: isFavoriteFuture.when(
+              loading: ()=> const CircularProgressIndicator(strokeWidth: 2),
+              data: (isFavorite) => isFavorite
+                  ? const Icon(Icons.favorite_rounded, color: Colors.red)
+                  : const Icon(Icons.favorite_border),
+              error: (_, __) => throw UnimplementedError(),
+              
             ),
+
+        ),
       ],
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
