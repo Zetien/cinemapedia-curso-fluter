@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/config/helpers/human_format.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
@@ -34,7 +36,7 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
 
       if ((scrollController.position.pixels + 200) >=
           scrollController.position.maxScrollExtent) {
-        print('load next movie');
+        log('load next movie');
         widget.loadNextPage!();
       }
     });

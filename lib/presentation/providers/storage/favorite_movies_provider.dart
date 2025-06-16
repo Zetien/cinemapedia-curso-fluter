@@ -12,20 +12,23 @@ final favoriteMoviesProvider = StateNotifierProvider<StorageMoviesNotifier,Map<i
 class StorageMoviesNotifier extends StateNotifier<Map<int, Movie>>{
   int page = 0;
   final LocalStorageRepository localStorageRepository;
+  
   StorageMoviesNotifier({
     required this.localStorageRepository
   }):super({});
 
-  Future<void>loadNextPage() async {
+  Future<List<Movie>> loadNextPage() async {
    final movies = await localStorageRepository.loadMovies(offset: page * 10);
     page++;
 
     final tempMoviesMap = <int, Movie>{};
     for(final movie in movies){
-      state = {...state, movie.id : movie};
+      tempMoviesMap[movie.id] = movie;
     }
 
     state = {...state, ...tempMoviesMap};
+
+    return movies;
   }
 
 
