@@ -17,7 +17,7 @@ class MovieMapper {
       posterPath: (moviedb.posterPath != '')
           ? 'https://image.tmdb.org/t/p/w500${moviedb.posterPath}'
           : 'https://www.lacinefest.org/uploads/2/6/7/4/26743637/no-poster_orig.jpeg',
-      releaseDate: moviedb.releaseDate,
+      releaseDate: moviedb.releaseDate != null ? moviedb.releaseDate! : DateTime.now(),
       title: moviedb.title,
       video: moviedb.video,
       voteAverage: moviedb.voteAverage,

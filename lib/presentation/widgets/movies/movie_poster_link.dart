@@ -6,10 +6,8 @@ import '../../../domain/entities/movie.dart';
 
 class MoviePosterLink extends StatelessWidget {
   final Movie movie;
-  const MoviePosterLink({
-    super.key,
-    required this.movie
-  });
+
+  const MoviePosterLink({super.key, required this.movie});
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +17,12 @@ class MoviePosterLink extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Image.network(
-            movie.posterPath
-                    )
-             ),
+            movie.posterPath,
+            width: double.infinity,
+            height: 200, // Altura fija para asegurar render
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
     );
   }
