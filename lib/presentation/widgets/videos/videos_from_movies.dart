@@ -31,35 +31,29 @@ class VideosFromMovie extends ConsumerWidget {
 }
 
 class _VideosList extends StatelessWidget {
-
   final List<Video> videos;
 
-  const _VideosList({required this.videos });
+  const _VideosList({required this.videos});
 
   @override
   Widget build(BuildContext context) {
+    if (videos.isEmpty) return const SizedBox();
 
-    //* Nada que mostrar
-    if ( videos.isEmpty ) {
-      return const SizedBox(); 
-    }
+    // Filtra solo trailers/teasers que suelen permitir embed
+    final playableVideos = videos.where((v) =>
+      v.name == 'Trailer' || v.name == 'Teaser'
+    ).toList();
+
+    final videoToShow = playableVideos.isNotEmpty ? playableVideos.first : videos.first;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ignore: prefer_const_constructors
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: const Text('Videos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+          child: const Text('Videos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         ),
-        
-        //* Aunque tengo varios videos, sólo quiero mostrar el primero
-        _YouTubeVideoPlayer(youtubeId: videos.first.youtubeKey, name: videos.first.name )
-        
-        //* Si se desean mostrar todos los videos
-        // ...videos.map(
-        //   (video) => _YouTubeVideoPlayer(youtubeId: videos.first.youtubeKey, name: video.name)
-        // ).toList()
+        _YouTubeVideoPlayer(youtubeId: videoToShow.youtubeKey, name: videoToShow.name),
       ],
     );
   }
@@ -77,13 +71,11 @@ class _YouTubeVideoPlayer extends StatefulWidget {
 }
 
 class _YouTubeVideoPlayerState extends State<_YouTubeVideoPlayer> {
-
-  late YoutubePlayerController _controller;  
+  late YoutubePlayerController _controller;
 
   @override
   void initState() {
     super.initState();
-    
     _controller = YoutubePlayerController(
       initialVideoId: widget.youtubeId,
       flags: const YoutubePlayerFlags(
@@ -98,12 +90,21 @@ class _YouTubeVideoPlayerState extends State<_YouTubeVideoPlayer> {
         enableCaption: false,
       ),
     );
+
+    // Escucha errores del player
+    _controller.addListener(_onPlayerStateChange);
   }
 
-
+  void _onPlayerStateChange() {
+    if (_controller.value.hasError) {
+      debugPrint('YouTube Error: ${_controller.value.errorCode}');
+      // Aquí puedes notificar al padre para intentar el siguiente video
+    }
+  }
 
   @override
   void dispose() {
+    _controller.removeListener(_onPlayerStateChange);
     _controller.dispose();
     super.dispose();
   }
