@@ -1,49 +1,43 @@
 import 'package:cinemapedia/domain/datasources/local_storage_datasource.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
-import 'package:isar/isar.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-class IsarDatasource  extends LocalStorageDataSource{
+class IsarDatasource extends LocalStorageDataSource {
+  static const _boxName = 'favorites';
 
-  late Future<Isar> db;
+  Future<Box<Movie>> get _box async => Hive.openBox<Movie>(_boxName);
 
-  IsarDatasource(){
-    db = openDb();
-  }
-
-  Future<Isar> openDb() async {
-    final dir = await getApplicationDocumentsDirectory();
-    if (Isar.instanceNames.isEmpty){
-      return await Isar.open([ MovieSchema ], inspector: true, directory: dir.path);
-    }
-    return Future.value(Isar.getInstance());
-  }
-  
   @override
   Future<bool> isMovieFavorite(int movieId) async {
-    final isar = await db;
-    final Movie? isFavoriteMovie = await isar.movies.filter().idEqualTo(movieId).findFirst();
-    return isFavoriteMovie != null;
-    
-  }     
-
-  @override
-  Future<void> toggleFavorite(Movie movie) async{
-    final isar = await db;
-    final favoriteMovie = await isar.movies.filter().idEqualTo(movie.id).findFirst();
-
-    if (favoriteMovie != null){
-      //borrar
-      isar.writeTxnSync(() => isar.movies.deleteSync(favoriteMovie.isarId!));
-      return;
-    }
-    //insertar
-    isar.writeTxnSync(() => isar.movies.putSync(movie));
+    final box = await _box;
+    return box.values.any((m) => m.id == movieId);
   }
 
-    @override
+  @override
+  Future<void> toggleFavorite(Movie movie) async {
+    final box = await _box;
+    final existing = box.values.firstWhere(
+      (m) => m.id == movie.id,
+      orElse: () => Movie(
+        adult: false, backdropPath: '', genreIds: [], id: -1,
+        originalLanguage: '', originalTitle: '', overview: '',
+        popularity: 0, posterPath: '', releaseDate: DateTime.now(),
+        title: '', video: false, voteAverage: 0, voteCount: 0,
+      ),
+    );
+
+    if (existing.id != -1) {
+      final key = box.keys.firstWhere((k) => (box.get(k) as Movie).id == movie.id);
+      await box.delete(key);
+    } else {
+      await box.add(movie);
+    }
+  }
+
+  @override
   Future<List<Movie>> loadMovies({int limit = 10, int offset = 0}) async {
-    final isar = await db;
-    return isar.movies.where().offset(offset).limit(limit).findAll();
+    final box = await _box;
+    final all = box.values.toList();
+    return all.skip(offset).take(limit).toList();
   }
 }
