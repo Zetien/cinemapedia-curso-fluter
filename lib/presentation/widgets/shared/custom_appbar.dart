@@ -10,9 +10,19 @@ class CustomAppbar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = Theme.of(context).colorScheme;
-    final titleStyle = Theme.of(context).textTheme.titleMedium;
-    return SafeArea(
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF0D0221),
+            Color(0xFF3A1F8F),
+            Color(0xFF6A4CE0),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SafeArea(
         bottom: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -20,35 +30,36 @@ class CustomAppbar extends ConsumerWidget {
             width: double.infinity,
             child: Row(
               children: [
-                Icon(
-                  Icons.movie_outlined,
-                  color: colors.primary,
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  'Cinemapedia',
-                  style: titleStyle,
+                Image.asset(
+                  'assets/image/logo_appbar.png',
+                  height: 50,
                 ),
                 const Spacer(),
                 IconButton(
-                    onPressed: () {
-                      final searchedMovies = ref.read(searchedMoviesProvider);
-                      final searchQuery = ref.read(searchQueryProvider);
-                      showSearch<Movie?>(
-                          query: searchQuery,
-                          context: context,
-                          delegate: SearchMovieDelegate(
-                            initialMovies: searchedMovies,
-                            searchMovies: ref.read(searchedMoviesProvider.notifier).searchMoviesByQuery)).then((movie) {
-                        if (movie == null) return;
-
-                        context.push('/home/0/movie/${movie.id}');
-                      });
-                    },
-                    icon: const Icon(Icons.search))
+                  onPressed: () {
+                    final searchedMovies = ref.read(searchedMoviesProvider);
+                    final searchQuery = ref.read(searchQueryProvider);
+                    showSearch<Movie?>(
+                      query: searchQuery,
+                      context: context,
+                      delegate: SearchMovieDelegate(
+                        initialMovies: searchedMovies,
+                        searchMovies: ref
+                            .read(searchedMoviesProvider.notifier)
+                            .searchMoviesByQuery,
+                      ),
+                    ).then((movie) {
+                      if (movie == null) return;
+                      context.push('/home/0/movie/${movie.id}');
+                    });
+                  },
+                  icon: const Icon(Icons.search, color: Colors.white),
+                ),
               ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
