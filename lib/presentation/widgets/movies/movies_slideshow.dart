@@ -33,7 +33,7 @@ class _Slide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final decoration = BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: const [
           BoxShadow(
               color: Colors.black45, blurRadius: 10, offset: Offset(0, 10))
@@ -43,7 +43,7 @@ class _Slide extends StatelessWidget {
         child: DecoratedBox(
           decoration: decoration,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(30),
             child: Image.network(movie.backdropPath,
                 loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress != null) {

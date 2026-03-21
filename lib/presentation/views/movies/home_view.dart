@@ -39,7 +39,7 @@ Widget build(BuildContext context) {
         floating: true,
         elevation: 0,
         titleSpacing: 0,
-        toolbarHeight: 60,           // 👈 ajusta según el alto de tu AppBar
+        toolbarHeight: 50,           // 👈 ajusta según el alto de tu AppBar
         flexibleSpace: const FlexibleSpaceBar(
           background: CustomAppbar(),
         ),
